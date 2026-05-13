@@ -1687,62 +1687,142 @@ const ServicesProfilePage = () => {
               </>
             ) : (
               // Service Provider Referrals
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <Users className="h-5 w-5 text-sheraton-gold" />
-                    Refer Service Partners & Earn
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-6">
-                  <div className="text-center p-6 bg-sheraton-gold/10 rounded-lg">
-                    <Gift className="h-12 w-12 mx-auto mb-4 text-sheraton-gold" />
-                    <h3 className="text-xl font-bold mb-2">Earn 500 Points</h3>
-                    <p className="text-muted-foreground mb-4">
-                      For each service provider you refer who completes their first task
-                    </p>
-                    <div className="flex items-center justify-center gap-2 p-3 bg-white rounded-lg border">
-                      <code className="font-mono text-lg">
-                        {generateServiceCode()}
-                      </code>
-                      <Button size="sm" onClick={copyServiceCode}>
-                        <Copy className="h-4 w-4" />
+              <>
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-2">
+                      <Users className="h-5 w-5 text-sheraton-gold" />
+                      Refer Service Providers & Property Managers
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent className="space-y-6">
+                    <div className="text-center p-6 bg-sheraton-gold/10 rounded-lg">
+                      <Gift className="h-12 w-12 mx-auto mb-4 text-sheraton-gold" />
+                      <h3 className="text-xl font-bold mb-2">Grow Your Network & Earn</h3>
+                      <p className="text-muted-foreground mb-4">
+                        Refer qualified service providers or property managers and earn rewards
+                      </p>
+                      <div className="flex items-center justify-center gap-2 p-3 bg-white rounded-lg border">
+                        <code className="font-mono text-lg">
+                          {generateServiceCode()}
+                        </code>
+                        <Button size="sm" onClick={copyServiceCode}>
+                          <Copy className="h-4 w-4" />
+                        </Button>
+                      </div>
+                      <Button className="mt-4 sheraton-gradient text-white">
+                        <Share2 className="h-4 w-4 mr-2" />
+                        Share Referral Link
                       </Button>
                     </div>
-                    <Button className="mt-4 sheraton-gradient text-white">
-                      <Share2 className="h-4 w-4 mr-2" />
-                      Share Partner Invite
-                    </Button>
-                  </div>
 
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                    <div className="text-center p-4 border rounded-lg">
-                      <div className="text-2xl font-bold text-sheraton-gold">
-                        8
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <Card className="border-2 border-sheraton-gold/30">
+                        <CardHeader className="pb-3">
+                          <CardTitle className="text-base flex items-center gap-2">
+                            <Users className="h-4 w-4 text-sheraton-gold" />
+                            Refer Service Providers
+                          </CardTitle>
+                        </CardHeader>
+                        <CardContent className="space-y-3">
+                          <div>
+                            <div className="text-2xl font-bold text-sheraton-gold">
+                              500 Points
+                            </div>
+                            <p className="text-xs text-muted-foreground mt-1">
+                              When they complete their first task
+                            </p>
+                          </div>
+                          <ul className="space-y-2 text-sm">
+                            <li className="flex items-start gap-2">
+                              <CheckCircle className="h-4 w-4 text-green-500 flex-shrink-0 mt-0.5" />
+                              <span>Bonus points to your account</span>
+                            </li>
+                            <li className="flex items-start gap-2">
+                              <CheckCircle className="h-4 w-4 text-green-500 flex-shrink-0 mt-0.5" />
+                              <span>Instant credit on completion</span>
+                            </li>
+                          </ul>
+                        </CardContent>
+                      </Card>
+
+                      <Card className="border-2 border-sheraton-gold/30">
+                        <CardHeader className="pb-3">
+                          <CardTitle className="text-base flex items-center gap-2">
+                            <Briefcase className="h-4 w-4 text-sheraton-gold" />
+                            Refer Property Managers
+                          </CardTitle>
+                        </CardHeader>
+                        <CardContent className="space-y-3">
+                          <div>
+                            <div className="text-2xl font-bold text-sheraton-gold">
+                              1,000 Points
+                            </div>
+                            <p className="text-xs text-muted-foreground mt-1">
+                              When they manage their first property
+                            </p>
+                          </div>
+                          <ul className="space-y-2 text-sm">
+                            <li className="flex items-start gap-2">
+                              <CheckCircle className="h-4 w-4 text-green-500 flex-shrink-0 mt-0.5" />
+                              <span>Premium bonus points</span>
+                            </li>
+                            <li className="flex items-start gap-2">
+                              <CheckCircle className="h-4 w-4 text-green-500 flex-shrink-0 mt-0.5" />
+                              <span>Unlock special privileges</span>
+                            </li>
+                          </ul>
+                        </CardContent>
+                      </Card>
+                    </div>
+                  </CardContent>
+                </Card>
+
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-2">
+                      <TrendingUp className="h-5 w-5 text-sheraton-gold" />
+                      Your Referral Performance
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                      <div className="text-center p-4 border rounded-lg">
+                        <div className="text-2xl font-bold text-sheraton-gold">
+                          8
+                        </div>
+                        <div className="text-sm text-muted-foreground">
+                          Total Referred
+                        </div>
                       </div>
-                      <div className="text-sm text-muted-foreground">
-                        Partners Referred
+                      <div className="text-center p-4 border rounded-lg">
+                        <div className="text-2xl font-bold text-sheraton-gold">
+                          6
+                        </div>
+                        <div className="text-sm text-muted-foreground">
+                          Active Users
+                        </div>
+                      </div>
+                      <div className="text-center p-4 border rounded-lg">
+                        <div className="text-2xl font-bold text-sheraton-gold">
+                          3,000
+                        </div>
+                        <div className="text-sm text-muted-foreground">
+                          Points Earned
+                        </div>
+                      </div>
+                      <div className="text-center p-4 border rounded-lg">
+                        <div className="text-2xl font-bold text-sheraton-gold">
+                          75%
+                        </div>
+                        <div className="text-sm text-muted-foreground">
+                          Conversion Rate
+                        </div>
                       </div>
                     </div>
-                    <div className="text-center p-4 border rounded-lg">
-                      <div className="text-2xl font-bold text-sheraton-gold">
-                        6
-                      </div>
-                      <div className="text-sm text-muted-foreground">
-                        Active Partners
-                      </div>
-                    </div>
-                    <div className="text-center p-4 border rounded-lg">
-                      <div className="text-2xl font-bold text-sheraton-gold">
-                        3,000
-                      </div>
-                      <div className="text-sm text-muted-foreground">
-                        Points Earned
-                      </div>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
+                  </CardContent>
+                </Card>
+              </>
             )}
           </TabsContent>
         </Tabs>
