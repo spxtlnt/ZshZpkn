@@ -70,6 +70,7 @@ const ServicesProfilePage = () => {
   const [isEditing, setIsEditing] = useState(false);
   const [showPerformanceDetails, setShowPerformanceDetails] = useState(false);
   const [dataLoaded, setDataLoaded] = useState(false);
+  const [userRole, setUserRole] = useState<'manager' | 'service_provider' | null>(null);
   const saveTimeoutsRef = useRef<Record<string, NodeJS.Timeout>>({});
   const userIdRef = useRef<string | null>(null);
 
@@ -142,6 +143,7 @@ const ServicesProfilePage = () => {
           .single();
 
         if (profile) {
+          setUserRole(profile.role || 'service_provider');
           setUserData((prev) => ({
             ...prev,
             firstName: profile.first_name || "",
@@ -324,16 +326,22 @@ const ServicesProfilePage = () => {
           <div className="flex items-center justify-center mb-4">
             <Briefcase className="h-8 w-8 text-sheraton-gold mr-2" />
             <Badge className="bg-sheraton-gold text-sheraton-navy px-4 py-2">
-              Service Partner
+              {userRole === 'manager' ? 'Property Manager' : 'Service Partner'}
             </Badge>
           </div>
           {userData.firstName && (
             <h1 className="text-4xl md:text-5xl font-bold text-sheraton-navy mb-4">
-              Welcome back, {userData.firstName}!
+              {userRole === 'manager'
+                ? `Good to see you, ${userData.firstName}!`
+                : `Welcome back, ${userData.firstName}!`
+              }
             </h1>
           )}
           <p className="text-lg text-muted-foreground">
-            Your service excellence continues • {performanceData.performanceTier} Member
+            {userRole === 'manager'
+              ? 'Manage your properties and service team • Dashboard'
+              : `Your service excellence continues • ${performanceData.performanceTier} Member`
+            }
           </p>
         </div>
 
@@ -355,7 +363,7 @@ const ServicesProfilePage = () => {
               className="flex items-center gap-2 py-3"
             >
               <BarChart3 className="h-4 w-4" />
-              <span className="hidden sm:inline">Performance</span>
+              <span className="hidden sm:inline">{userRole === 'manager' ? 'Analytics' : 'Performance'}</span>
             </TabsTrigger>
             <TabsTrigger
               value="profile"
@@ -369,7 +377,7 @@ const ServicesProfilePage = () => {
               className="flex items-center gap-2 py-3"
             >
               <Receipt className="h-4 w-4" />
-              <span className="hidden sm:inline">Activities</span>
+              <span className="hidden sm:inline">{userRole === 'manager' ? 'Reports' : 'Activities'}</span>
             </TabsTrigger>
             <TabsTrigger
               value="preferences"
@@ -389,358 +397,687 @@ const ServicesProfilePage = () => {
 
           {/* Dashboard Tab */}
           <TabsContent value="dashboard" className="space-y-6">
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-              {/* Service Summary */}
-              <Card className="lg:col-span-1">
-                <CardHeader className="text-center">
-                  <div className="relative w-24 h-24 mx-auto mb-4">
-                    <Avatar className="w-24 h-24">
-                      <AvatarImage src={userData.profilePicture} />
-                      <AvatarFallback className="text-2xl font-bold bg-sheraton-gold text-sheraton-navy">
-                        {userData.firstName[0]}
-                        {userData.lastName[0]}
-                      </AvatarFallback>
-                    </Avatar>
-                    <Button
-                      size="sm"
-                      className="absolute -bottom-2 -right-2 rounded-full w-8 h-8 p-0 sheraton-gradient"
-                    >
-                      <Camera className="h-4 w-4" />
-                    </Button>
-                  </div>
-                  <CardTitle className="text-sheraton-navy">
-                    {userData.firstName} {userData.lastName}
-                  </CardTitle>
-                  <Badge className="sheraton-gradient text-white">
-                    {performanceData.performanceTier}
-                  </Badge>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  <div className="text-center">
-                    <div className="text-2xl font-bold text-sheraton-gold mb-1">
-                      {performanceData.currentRating}
-                    </div>
-                    <div className="text-sm text-muted-foreground">
-                      Service Rating
-                    </div>
-                  </div>
-
-                  <div className="space-y-2">
-                    <div className="flex justify-between text-sm">
-                      <span>Progress to {performanceData.nextBadge}</span>
-                      <span>{performanceData.badgeProgress}%</span>
-                    </div>
-                    <Progress
-                      value={performanceData.badgeProgress}
-                      className="h-2"
-                    />
-                    <div className="text-xs text-muted-foreground text-center">
-                      {performanceData.pointsToNextBadge} points to next tier
-                    </div>
-                  </div>
-
-                  <div className="grid grid-cols-2 gap-4 text-center">
-                    <div>
-                      <div className="text-lg font-semibold">
-                        {format(new Date(userData.memberSince), "MMM yyyy")}
-                      </div>
-                      <div className="text-xs text-muted-foreground">
-                        Partner Since
-                      </div>
-                    </div>
-                    <div>
-                      <div className="text-lg font-semibold">
-                        {performanceData.lifetimeTasks}
-                      </div>
-                      <div className="text-xs text-muted-foreground">
-                        Tasks Completed
-                      </div>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-
-              {/* Quick Stats & Opportunities */}
-              <Card className="lg:col-span-2">
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <Zap className="h-5 w-5 text-sheraton-gold" />
-                    Performance Overview
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-6">
-                  {/* Key Metrics */}
-                  <div className="grid grid-cols-3 gap-4">
-                    <div className="text-center p-3 bg-blue-50 rounded-lg">
-                      <div className="text-lg font-semibold text-blue-700">
-                        {performanceData.tasksInProgress}
-                      </div>
-                      <div className="text-xs text-blue-600">In Progress</div>
-                    </div>
-                    <div className="text-center p-3 bg-green-50 rounded-lg">
-                      <div className="text-lg font-semibold text-green-700">
-                        {performanceData.qualityScore}%
-                      </div>
-                      <div className="text-xs text-green-600">Quality Score</div>
-                    </div>
-                    <div className="text-center p-3 bg-purple-50 rounded-lg">
-                      <div className="text-lg font-semibold text-purple-700">
-                        {performanceData.avgCompletionTime}
-                      </div>
-                      <div className="text-xs text-purple-600">Avg. Time</div>
-                    </div>
-                  </div>
-
-                  {/* Quick Actions */}
-                  <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                    <Link to="/tasks/list">
-                      <Button className="w-full h-20 flex flex-col gap-2 sheraton-gradient text-white">
-                        <CheckCircle className="h-6 w-6" />
-                        <span className="text-xs">View Tasks</span>
-                      </Button>
-                    </Link>
-                    <Link to="/reports">
-                      <Button
-                        className="w-full h-20 flex flex-col gap-2"
-                        variant="outline"
-                      >
-                        <BarChart3 className="h-6 w-6 text-sheraton-gold" />
-                        <span className="text-xs">Reports</span>
-                      </Button>
-                    </Link>
-                    <Link to="/accounts">
-                      <Button
-                        className="w-full h-20 flex flex-col gap-2"
-                        variant="outline"
-                      >
-                        <Users className="h-6 w-6 text-sheraton-gold" />
-                        <span className="text-xs">Team</span>
-                      </Button>
-                    </Link>
-                    <Link to="/profile">
-                      <Button
-                        className="w-full h-20 flex flex-col gap-2"
-                        variant="outline"
-                      >
-                        <Settings className="h-6 w-6 text-sheraton-gold" />
-                        <span className="text-xs">Settings</span>
-                      </Button>
-                    </Link>
-                  </div>
-
-                  {/* Active Opportunities */}
-                  <div className="space-y-3">
-                    <h3 className="font-semibold text-sheraton-navy">
-                      Active Opportunities
-                    </h3>
-                    {activeOpportunities.slice(0, 2).map((opportunity) => (
-                      <div
-                        key={opportunity.id}
-                        className="flex items-center justify-between p-3 bg-sheraton-gold/10 rounded-lg border border-sheraton-gold/30"
-                      >
-                        <div className="flex items-center gap-3">
-                          <div className="text-2xl">{opportunity.emoji}</div>
-                          <div>
-                            <h4 className="font-medium text-sheraton-navy">
-                              {opportunity.title}
-                            </h4>
-                            <p className="text-sm text-muted-foreground">
-                              {opportunity.description}
-                            </p>
-                          </div>
-                        </div>
+            {userRole === 'manager' ? (
+              // Manager Dashboard
+              <>
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                  {/* Manager Profile Card */}
+                  <Card className="lg:col-span-1">
+                    <CardHeader className="text-center">
+                      <div className="relative w-24 h-24 mx-auto mb-4">
+                        <Avatar className="w-24 h-24">
+                          <AvatarImage src={userData.profilePicture} />
+                          <AvatarFallback className="text-2xl font-bold bg-sheraton-gold text-sheraton-navy">
+                            {userData.firstName[0]}
+                            {userData.lastName[0]}
+                          </AvatarFallback>
+                        </Avatar>
                         <Button
                           size="sm"
-                          className="sheraton-gradient text-white"
+                          className="absolute -bottom-2 -right-2 rounded-full w-8 h-8 p-0 sheraton-gradient"
                         >
-                          View
+                          <Camera className="h-4 w-4" />
                         </Button>
                       </div>
-                    ))}
-                  </div>
-                </CardContent>
-              </Card>
-            </div>
+                      <CardTitle className="text-sheraton-navy">
+                        {userData.firstName} {userData.lastName}
+                      </CardTitle>
+                      <Badge className="sheraton-gradient text-white">
+                        Property Manager
+                      </Badge>
+                    </CardHeader>
+                    <CardContent className="space-y-4">
+                      <div className="text-center">
+                        <div className="text-2xl font-bold text-sheraton-gold mb-1">
+                          {format(new Date(userData.memberSince), "MMM yyyy")}
+                        </div>
+                        <div className="text-sm text-muted-foreground">
+                          Manager Since
+                        </div>
+                      </div>
 
-            {/* Recent Activities */}
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <History className="h-5 w-5 text-sheraton-gold" />
-                  Recent Activities
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-3">
-                  {recentActivities.slice(0, 3).map((activity) => (
-                    <div
-                      key={activity.id}
-                      className="flex items-center justify-between"
-                    >
-                      <div className="flex items-center gap-3">
-                        <div
-                          className={`w-10 h-10 rounded-full flex items-center justify-center ${
-                            activity.type === "completion"
-                              ? "bg-green-100 text-green-600"
-                              : "bg-blue-100 text-blue-600"
-                          }`}
-                        >
-                          {activity.type === "completion" ? (
-                            <CheckCircle className="h-5 w-5" />
-                          ) : (
-                            <Gift className="h-5 w-5" />
-                          )}
+                      <Separator />
+
+                      <div className="grid grid-cols-2 gap-4 text-center">
+                        <div>
+                          <div className="text-lg font-semibold">5</div>
+                          <div className="text-xs text-muted-foreground">
+                            Properties
+                          </div>
                         </div>
                         <div>
-                          <h4 className="font-medium">
-                            {activity.description}
-                          </h4>
-                          <p className="text-sm text-muted-foreground">
-                            {format(new Date(activity.date), "MMM dd, yyyy")}
-                          </p>
+                          <div className="text-lg font-semibold">23</div>
+                          <div className="text-xs text-muted-foreground">
+                            Active Tasks
+                          </div>
                         </div>
                       </div>
-                      <div
-                        className={`font-semibold ${
-                          activity.type === "completion"
-                            ? "text-green-600"
-                            : "text-blue-600"
-                        }`}
-                      >
-                        {activity.points}
+                    </CardContent>
+                  </Card>
+
+                  {/* Manager Overview */}
+                  <Card className="lg:col-span-2">
+                    <CardHeader>
+                      <CardTitle className="flex items-center gap-2">
+                        <Zap className="h-5 w-5 text-sheraton-gold" />
+                        Management Overview
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent className="space-y-6">
+                      {/* Key Metrics */}
+                      <div className="grid grid-cols-3 gap-4">
+                        <div className="text-center p-3 bg-blue-50 rounded-lg">
+                          <div className="text-lg font-semibold text-blue-700">
+                            12
+                          </div>
+                          <div className="text-xs text-blue-600">Pending Tasks</div>
+                        </div>
+                        <div className="text-center p-3 bg-green-50 rounded-lg">
+                          <div className="text-lg font-semibold text-green-700">
+                            8
+                          </div>
+                          <div className="text-xs text-green-600">In Progress</div>
+                        </div>
+                        <div className="text-center p-3 bg-purple-50 rounded-lg">
+                          <div className="text-lg font-semibold text-purple-700">
+                            3
+                          </div>
+                          <div className="text-xs text-purple-600">Completed Today</div>
+                        </div>
                       </div>
-                    </div>
-                  ))}
+
+                      {/* Quick Actions */}
+                      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                        <Link to="/tasks/list">
+                          <Button className="w-full h-20 flex flex-col gap-2 sheraton-gradient text-white">
+                            <CheckCircle className="h-6 w-6" />
+                            <span className="text-xs">All Tasks</span>
+                          </Button>
+                        </Link>
+                        <Link to="/reports">
+                          <Button
+                            className="w-full h-20 flex flex-col gap-2"
+                            variant="outline"
+                          >
+                            <BarChart3 className="h-6 w-6 text-sheraton-gold" />
+                            <span className="text-xs">Reports</span>
+                          </Button>
+                        </Link>
+                        <Link to="/accounts">
+                          <Button
+                            className="w-full h-20 flex flex-col gap-2"
+                            variant="outline"
+                          >
+                            <Users className="h-6 w-6 text-sheraton-gold" />
+                            <span className="text-xs">Team</span>
+                          </Button>
+                        </Link>
+                        <Link to="/profile">
+                          <Button
+                            className="w-full h-20 flex flex-col gap-2"
+                            variant="outline"
+                          >
+                            <Settings className="h-6 w-6 text-sheraton-gold" />
+                            <span className="text-xs">Settings</span>
+                          </Button>
+                        </Link>
+                      </div>
+
+                      {/* Budget Overview */}
+                      <div className="space-y-3">
+                        <h3 className="font-semibold text-sheraton-navy">
+                          Budget Status
+                        </h3>
+                        <div className="p-3 bg-amber-50 rounded-lg border border-amber-200">
+                          <div className="flex justify-between text-sm mb-2">
+                            <span>Monthly Budget</span>
+                            <span className="font-semibold">$8,500 / $10,000</span>
+                          </div>
+                          <Progress value={85} className="h-2" />
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
                 </div>
-                <Button variant="outline" className="w-full mt-4">
-                  View All Activities
-                </Button>
-              </CardContent>
-            </Card>
+
+                {/* Recent Tasks */}
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-2">
+                      <History className="h-5 w-5 text-sheraton-gold" />
+                      Recent Tasks
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="space-y-3">
+                      {recentActivities.slice(0, 3).map((activity) => (
+                        <div
+                          key={activity.id}
+                          className="flex items-center justify-between"
+                        >
+                          <div className="flex items-center gap-3">
+                            <div
+                              className={`w-10 h-10 rounded-full flex items-center justify-center ${
+                                activity.type === "completion"
+                                  ? "bg-green-100 text-green-600"
+                                  : "bg-blue-100 text-blue-600"
+                              }`}
+                            >
+                              {activity.type === "completion" ? (
+                                <CheckCircle className="h-5 w-5" />
+                              ) : (
+                                <Clock className="h-5 w-5" />
+                              )}
+                            </div>
+                            <div>
+                              <h4 className="font-medium">
+                                {activity.description}
+                              </h4>
+                              <p className="text-sm text-muted-foreground">
+                                {format(new Date(activity.date), "MMM dd, yyyy")}
+                              </p>
+                            </div>
+                          </div>
+                          <Badge
+                            className={
+                              activity.type === "completion"
+                                ? "bg-green-100 text-green-700"
+                                : "bg-blue-100 text-blue-700"
+                            }
+                          >
+                            {activity.status}
+                          </Badge>
+                        </div>
+                      ))}
+                    </div>
+                    <Button variant="outline" className="w-full mt-4">
+                      View All Tasks
+                    </Button>
+                  </CardContent>
+                </Card>
+              </>
+            ) : (
+              // Service Provider Dashboard
+              <>
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                  {/* Service Summary */}
+                  <Card className="lg:col-span-1">
+                    <CardHeader className="text-center">
+                      <div className="relative w-24 h-24 mx-auto mb-4">
+                        <Avatar className="w-24 h-24">
+                          <AvatarImage src={userData.profilePicture} />
+                          <AvatarFallback className="text-2xl font-bold bg-sheraton-gold text-sheraton-navy">
+                            {userData.firstName[0]}
+                            {userData.lastName[0]}
+                          </AvatarFallback>
+                        </Avatar>
+                        <Button
+                          size="sm"
+                          className="absolute -bottom-2 -right-2 rounded-full w-8 h-8 p-0 sheraton-gradient"
+                        >
+                          <Camera className="h-4 w-4" />
+                        </Button>
+                      </div>
+                      <CardTitle className="text-sheraton-navy">
+                        {userData.firstName} {userData.lastName}
+                      </CardTitle>
+                      <Badge className="sheraton-gradient text-white">
+                        {performanceData.performanceTier}
+                      </Badge>
+                    </CardHeader>
+                    <CardContent className="space-y-4">
+                      <div className="text-center">
+                        <div className="text-2xl font-bold text-sheraton-gold mb-1">
+                          {performanceData.currentRating}
+                        </div>
+                        <div className="text-sm text-muted-foreground">
+                          Service Rating
+                        </div>
+                      </div>
+
+                      <div className="space-y-2">
+                        <div className="flex justify-between text-sm">
+                          <span>Progress to {performanceData.nextBadge}</span>
+                          <span>{performanceData.badgeProgress}%</span>
+                        </div>
+                        <Progress
+                          value={performanceData.badgeProgress}
+                          className="h-2"
+                        />
+                        <div className="text-xs text-muted-foreground text-center">
+                          {performanceData.pointsToNextBadge} points to next tier
+                        </div>
+                      </div>
+
+                      <div className="grid grid-cols-2 gap-4 text-center">
+                        <div>
+                          <div className="text-lg font-semibold">
+                            {format(new Date(userData.memberSince), "MMM yyyy")}
+                          </div>
+                          <div className="text-xs text-muted-foreground">
+                            Partner Since
+                          </div>
+                        </div>
+                        <div>
+                          <div className="text-lg font-semibold">
+                            {performanceData.lifetimeTasks}
+                          </div>
+                          <div className="text-xs text-muted-foreground">
+                            Tasks Completed
+                          </div>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+
+                  {/* Quick Stats & Opportunities */}
+                  <Card className="lg:col-span-2">
+                    <CardHeader>
+                      <CardTitle className="flex items-center gap-2">
+                        <Zap className="h-5 w-5 text-sheraton-gold" />
+                        Performance Overview
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent className="space-y-6">
+                      {/* Key Metrics */}
+                      <div className="grid grid-cols-3 gap-4">
+                        <div className="text-center p-3 bg-blue-50 rounded-lg">
+                          <div className="text-lg font-semibold text-blue-700">
+                            {performanceData.tasksInProgress}
+                          </div>
+                          <div className="text-xs text-blue-600">In Progress</div>
+                        </div>
+                        <div className="text-center p-3 bg-green-50 rounded-lg">
+                          <div className="text-lg font-semibold text-green-700">
+                            {performanceData.qualityScore}%
+                          </div>
+                          <div className="text-xs text-green-600">Quality Score</div>
+                        </div>
+                        <div className="text-center p-3 bg-purple-50 rounded-lg">
+                          <div className="text-lg font-semibold text-purple-700">
+                            {performanceData.avgCompletionTime}
+                          </div>
+                          <div className="text-xs text-purple-600">Avg. Time</div>
+                        </div>
+                      </div>
+
+                      {/* Quick Actions */}
+                      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                        <Link to="/tasks/list">
+                          <Button className="w-full h-20 flex flex-col gap-2 sheraton-gradient text-white">
+                            <CheckCircle className="h-6 w-6" />
+                            <span className="text-xs">View Tasks</span>
+                          </Button>
+                        </Link>
+                        <Link to="/reports">
+                          <Button
+                            className="w-full h-20 flex flex-col gap-2"
+                            variant="outline"
+                          >
+                            <BarChart3 className="h-6 w-6 text-sheraton-gold" />
+                            <span className="text-xs">Reports</span>
+                          </Button>
+                        </Link>
+                        <Link to="/accounts">
+                          <Button
+                            className="w-full h-20 flex flex-col gap-2"
+                            variant="outline"
+                          >
+                            <Users className="h-6 w-6 text-sheraton-gold" />
+                            <span className="text-xs">Team</span>
+                          </Button>
+                        </Link>
+                        <Link to="/profile">
+                          <Button
+                            className="w-full h-20 flex flex-col gap-2"
+                            variant="outline"
+                          >
+                            <Settings className="h-6 w-6 text-sheraton-gold" />
+                            <span className="text-xs">Settings</span>
+                          </Button>
+                        </Link>
+                      </div>
+
+                      {/* Active Opportunities */}
+                      <div className="space-y-3">
+                        <h3 className="font-semibold text-sheraton-navy">
+                          Active Opportunities
+                        </h3>
+                        {activeOpportunities.slice(0, 2).map((opportunity) => (
+                          <div
+                            key={opportunity.id}
+                            className="flex items-center justify-between p-3 bg-sheraton-gold/10 rounded-lg border border-sheraton-gold/30"
+                          >
+                            <div className="flex items-center gap-3">
+                              <div className="text-2xl">{opportunity.emoji}</div>
+                              <div>
+                                <h4 className="font-medium text-sheraton-navy">
+                                  {opportunity.title}
+                                </h4>
+                                <p className="text-sm text-muted-foreground">
+                                  {opportunity.description}
+                                </p>
+                              </div>
+                            </div>
+                            <Button
+                              size="sm"
+                              className="sheraton-gradient text-white"
+                            >
+                              View
+                            </Button>
+                          </div>
+                        ))}
+                      </div>
+                    </CardContent>
+                  </Card>
+                </div>
+
+                {/* Recent Activities */}
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-2">
+                      <History className="h-5 w-5 text-sheraton-gold" />
+                      Recent Activities
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="space-y-3">
+                      {recentActivities.slice(0, 3).map((activity) => (
+                        <div
+                          key={activity.id}
+                          className="flex items-center justify-between"
+                        >
+                          <div className="flex items-center gap-3">
+                            <div
+                              className={`w-10 h-10 rounded-full flex items-center justify-center ${
+                                activity.type === "completion"
+                                  ? "bg-green-100 text-green-600"
+                                  : "bg-blue-100 text-blue-600"
+                              }`}
+                            >
+                              {activity.type === "completion" ? (
+                                <CheckCircle className="h-5 w-5" />
+                              ) : (
+                                <Gift className="h-5 w-5" />
+                              )}
+                            </div>
+                            <div>
+                              <h4 className="font-medium">
+                                {activity.description}
+                              </h4>
+                              <p className="text-sm text-muted-foreground">
+                                {format(new Date(activity.date), "MMM dd, yyyy")}
+                              </p>
+                            </div>
+                          </div>
+                          <div
+                            className={`font-semibold ${
+                              activity.type === "completion"
+                                ? "text-green-600"
+                                : "text-blue-600"
+                            }`}
+                          >
+                            {activity.points}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                    <Button variant="outline" className="w-full mt-4">
+                      View All Activities
+                    </Button>
+                  </CardContent>
+                </Card>
+              </>
+            )}
           </TabsContent>
 
           {/* Performance Tab */}
           <TabsContent value="performance" className="space-y-6">
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              {/* Performance Metrics */}
-              <Card className="sheraton-gradient text-white">
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <Star className="h-5 w-5" />
-                    Your Performance
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  <div className="text-center">
-                    <div className="text-4xl font-bold mb-2">
-                      {performanceData.currentRating}
-                    </div>
-                    <div className="text-white/80">Service Rating</div>
-                  </div>
-
-                  <div className="grid grid-cols-3 gap-4 text-center">
-                    <div>
-                      <div className="text-lg font-semibold">
-                        {performanceData.tasksCompleted}
+            {userRole === 'manager' ? (
+              // Manager Analytics
+              <>
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                  {/* Overall Portfolio Health */}
+                  <Card className="sheraton-gradient text-white">
+                    <CardHeader>
+                      <CardTitle className="flex items-center gap-2">
+                        <BarChart3 className="h-5 w-5" />
+                        Portfolio Health
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent className="space-y-4">
+                      <div className="text-center">
+                        <div className="text-4xl font-bold mb-2">94%</div>
+                        <div className="text-white/80">Overall Efficiency</div>
                       </div>
-                      <div className="text-xs text-white/70">Completed</div>
-                    </div>
-                    <div>
-                      <div className="text-lg font-semibold">
-                        {performanceData.qualityScore}%
+
+                      <div className="grid grid-cols-3 gap-4 text-center">
+                        <div>
+                          <div className="text-lg font-semibold">23</div>
+                          <div className="text-xs text-white/70">Active Tasks</div>
+                        </div>
+                        <div>
+                          <div className="text-lg font-semibold">145</div>
+                          <div className="text-xs text-white/70">Total Completed</div>
+                        </div>
+                        <div>
+                          <div className="text-lg font-semibold">3.2d</div>
+                          <div className="text-xs text-white/70">Avg Turnaround</div>
+                        </div>
                       </div>
-                      <div className="text-xs text-white/70">Quality</div>
-                    </div>
-                    <div>
-                      <div className="text-lg font-semibold">
-                        {performanceData.tasksInProgress}
+
+                      <div className="grid grid-cols-2 gap-2">
+                        <Button className="bg-white text-sheraton-navy hover:bg-white/90">
+                          <BarChart3 className="h-4 w-4 mr-2" />
+                          Full Analytics
+                        </Button>
+                        <Button
+                          variant="outline"
+                          className="border-white text-white hover:bg-white/10"
+                        >
+                          <Download className="h-4 w-4 mr-2" />
+                          Export
+                        </Button>
                       </div>
-                      <div className="text-xs text-white/70">In Progress</div>
-                    </div>
-                  </div>
+                    </CardContent>
+                  </Card>
 
-                  <div className="grid grid-cols-2 gap-2">
-                    <Button className="bg-white text-sheraton-navy hover:bg-white/90">
-                      <BarChart3 className="h-4 w-4 mr-2" />
-                      Analytics
-                    </Button>
-                    <Button
-                      variant="outline"
-                      className="border-white text-white hover:bg-white/10"
-                    >
-                      <Download className="h-4 w-4 mr-2" />
-                      Report
-                    </Button>
-                  </div>
-                </CardContent>
-              </Card>
-
-              {/* Tier Benefits */}
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <Award className="h-5 w-5 text-sheraton-gold" />
-                    {performanceData.performanceTier} Benefits
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  <div className="space-y-2">
-                    {performanceData.benefits.map((benefit, index) => (
-                      <div key={index} className="flex items-center gap-2">
-                        <CheckCircle className="h-4 w-4 text-green-500" />
-                        <span className="text-sm">{benefit}</span>
-                      </div>
-                    ))}
-                  </div>
-
-                  <Separator />
-
-                  <div>
-                    <h4 className="font-medium mb-2 text-sheraton-navy">
-                      Unlock {performanceData.nextBadge}
-                    </h4>
-                    <div className="space-y-1">
-                      {performanceData.nextTierBenefits
-                        .slice(0, 3)
-                        .map((benefit, index) => (
-                          <div key={index} className="flex items-center gap-2">
-                            <Target className="h-4 w-4 text-sheraton-gold" />
-                            <span className="text-sm text-muted-foreground">
-                              {benefit}
-                            </span>
+                  {/* Service Provider Performance */}
+                  <Card>
+                    <CardHeader>
+                      <CardTitle className="flex items-center gap-2">
+                        <Users className="h-5 w-5 text-sheraton-gold" />
+                        Service Team Performance
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent className="space-y-4">
+                      <div className="space-y-3">
+                        {[
+                          { name: 'John Smith', rating: 4.8, tasks: 42 },
+                          { name: 'Sarah Johnson', rating: 4.6, tasks: 38 },
+                          { name: 'Mike Brown', rating: 4.9, tasks: 45 },
+                        ].map((provider, index) => (
+                          <div key={index} className="p-3 border rounded-lg">
+                            <div className="flex justify-between items-center mb-2">
+                              <h4 className="font-medium text-sm">{provider.name}</h4>
+                              <Badge variant="outline">{provider.rating} ⭐</Badge>
+                            </div>
+                            <div className="flex items-center justify-between text-xs text-muted-foreground">
+                              <span>{provider.tasks} tasks completed</span>
+                              <span>Top Performer</span>
+                            </div>
                           </div>
                         ))}
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            </div>
+                      </div>
 
-            {/* How to Improve Performance */}
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <TrendingUp className="h-5 w-5 text-sheraton-gold" />
-                  Ways to Earn Recognition Points
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                  {taskEarningActivities.map((activity, index) => (
-                    <div
-                      key={index}
-                      className="text-center p-4 border rounded-lg"
-                    >
-                      <activity.icon className="h-8 w-8 mx-auto mb-2 text-sheraton-gold" />
-                      <h3 className="font-medium mb-1">{activity.activity}</h3>
-                      <p className="text-sm text-muted-foreground">
-                        {activity.points}
-                      </p>
-                    </div>
-                  ))}
+                      <Separator />
+
+                      <Button variant="outline" className="w-full">
+                        View All Providers
+                      </Button>
+                    </CardContent>
+                  </Card>
                 </div>
-              </CardContent>
-            </Card>
+
+                {/* Key Metrics */}
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-2">
+                      <TrendingUp className="h-5 w-5 text-sheraton-gold" />
+                      Property Management Metrics
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                      <div className="text-center p-4 border rounded-lg">
+                        <DollarSign className="h-8 w-8 mx-auto mb-2 text-sheraton-gold" />
+                        <h3 className="font-medium text-sm mb-1">Budget Utilization</h3>
+                        <p className="text-lg font-semibold">85%</p>
+                      </div>
+                      <div className="text-center p-4 border rounded-lg">
+                        <Clock className="h-8 w-8 mx-auto mb-2 text-sheraton-gold" />
+                        <h3 className="font-medium text-sm mb-1">On-Time Rate</h3>
+                        <p className="text-lg font-semibold">96%</p>
+                      </div>
+                      <div className="text-center p-4 border rounded-lg">
+                        <Star className="h-8 w-8 mx-auto mb-2 text-sheraton-gold" />
+                        <h3 className="font-medium text-sm mb-1">Avg Rating</h3>
+                        <p className="text-lg font-semibold">4.7/5</p>
+                      </div>
+                      <div className="text-center p-4 border rounded-lg">
+                        <CheckCircle className="h-8 w-8 mx-auto mb-2 text-sheraton-gold" />
+                        <h3 className="font-medium text-sm mb-1">Completion Rate</h3>
+                        <p className="text-lg font-semibold">98%</p>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              </>
+            ) : (
+              // Service Provider Performance
+              <>
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                  {/* Performance Metrics */}
+                  <Card className="sheraton-gradient text-white">
+                    <CardHeader>
+                      <CardTitle className="flex items-center gap-2">
+                        <Star className="h-5 w-5" />
+                        Your Performance
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent className="space-y-4">
+                      <div className="text-center">
+                        <div className="text-4xl font-bold mb-2">
+                          {performanceData.currentRating}
+                        </div>
+                        <div className="text-white/80">Service Rating</div>
+                      </div>
+
+                      <div className="grid grid-cols-3 gap-4 text-center">
+                        <div>
+                          <div className="text-lg font-semibold">
+                            {performanceData.tasksCompleted}
+                          </div>
+                          <div className="text-xs text-white/70">Completed</div>
+                        </div>
+                        <div>
+                          <div className="text-lg font-semibold">
+                            {performanceData.qualityScore}%
+                          </div>
+                          <div className="text-xs text-white/70">Quality</div>
+                        </div>
+                        <div>
+                          <div className="text-lg font-semibold">
+                            {performanceData.tasksInProgress}
+                          </div>
+                          <div className="text-xs text-white/70">In Progress</div>
+                        </div>
+                      </div>
+
+                      <div className="grid grid-cols-2 gap-2">
+                        <Button className="bg-white text-sheraton-navy hover:bg-white/90">
+                          <BarChart3 className="h-4 w-4 mr-2" />
+                          Analytics
+                        </Button>
+                        <Button
+                          variant="outline"
+                          className="border-white text-white hover:bg-white/10"
+                        >
+                          <Download className="h-4 w-4 mr-2" />
+                          Report
+                        </Button>
+                      </div>
+                    </CardContent>
+                  </Card>
+
+                  {/* Tier Benefits */}
+                  <Card>
+                    <CardHeader>
+                      <CardTitle className="flex items-center gap-2">
+                        <Award className="h-5 w-5 text-sheraton-gold" />
+                        {performanceData.performanceTier} Benefits
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent className="space-y-4">
+                      <div className="space-y-2">
+                        {performanceData.benefits.map((benefit, index) => (
+                          <div key={index} className="flex items-center gap-2">
+                            <CheckCircle className="h-4 w-4 text-green-500" />
+                            <span className="text-sm">{benefit}</span>
+                          </div>
+                        ))}
+                      </div>
+
+                      <Separator />
+
+                      <div>
+                        <h4 className="font-medium mb-2 text-sheraton-navy">
+                          Unlock {performanceData.nextBadge}
+                        </h4>
+                        <div className="space-y-1">
+                          {performanceData.nextTierBenefits
+                            .slice(0, 3)
+                            .map((benefit, index) => (
+                              <div key={index} className="flex items-center gap-2">
+                                <Target className="h-4 w-4 text-sheraton-gold" />
+                                <span className="text-sm text-muted-foreground">
+                                  {benefit}
+                                </span>
+                              </div>
+                            ))}
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                </div>
+
+                {/* How to Improve Performance */}
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-2">
+                      <TrendingUp className="h-5 w-5 text-sheraton-gold" />
+                      Ways to Earn Recognition Points
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                      {taskEarningActivities.map((activity, index) => (
+                        <div
+                          key={index}
+                          className="text-center p-4 border rounded-lg"
+                        >
+                          <activity.icon className="h-8 w-8 mx-auto mb-2 text-sheraton-gold" />
+                          <h3 className="font-medium mb-1">{activity.activity}</h3>
+                          <p className="text-sm text-muted-foreground">
+                            {activity.points}
+                          </p>
+                        </div>
+                      ))}
+                    </div>
+                  </CardContent>
+                </Card>
+              </>
+            )}
           </TabsContent>
 
           {/* Profile Tab */}
@@ -850,64 +1187,165 @@ const ServicesProfilePage = () => {
 
           {/* Activities Tab */}
           <TabsContent value="activities" className="space-y-6">
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Receipt className="h-5 w-5 text-sheraton-gold" />
-                  Activity History & Earnings
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-4">
-                  {recentActivities.map((activity) => (
-                    <div
-                      key={activity.id}
-                      className="flex items-center justify-between p-4 border rounded-lg"
-                    >
-                      <div className="flex items-center gap-4">
+            {userRole === 'manager' ? (
+              // Manager Reports
+              <>
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-2">
+                      <BarChart3 className="h-5 w-5 text-sheraton-gold" />
+                      Management Reports
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="space-y-4">
+                      {[
+                        {
+                          title: 'Monthly Task Report',
+                          date: '2024-01-15',
+                          tasks: 23,
+                          completed: 21,
+                          status: 'completed',
+                        },
+                        {
+                          title: 'Budget Utilization Report',
+                          date: '2024-01-14',
+                          budget: '$8,500/$10,000',
+                          status: 'completed',
+                        },
+                        {
+                          title: 'Service Provider Performance Review',
+                          date: '2024-01-10',
+                          providers: 5,
+                          avgRating: 4.7,
+                          status: 'completed',
+                        },
+                        {
+                          title: 'Property Maintenance Summary',
+                          date: '2024-01-08',
+                          properties: 5,
+                          activeIssues: 2,
+                          status: 'completed',
+                        },
+                      ].map((report, index) => (
                         <div
-                          className={`w-12 h-12 rounded-full flex items-center justify-center ${
-                            activity.type === "completion"
-                              ? "bg-green-100 text-green-600"
-                              : "bg-blue-100 text-blue-600"
-                          }`}
+                          key={index}
+                          className="flex items-center justify-between p-4 border rounded-lg"
                         >
-                          {activity.type === "completion" ? (
-                            <CheckCircle className="h-6 w-6" />
-                          ) : (
-                            <Gift className="h-6 w-6" />
-                          )}
+                          <div className="flex items-center gap-4">
+                            <div className="w-12 h-12 rounded-full flex items-center justify-center bg-blue-100 text-blue-600">
+                              <BarChart3 className="h-6 w-6" />
+                            </div>
+                            <div>
+                              <h4 className="font-medium">{report.title}</h4>
+                              <p className="text-sm text-muted-foreground">
+                                {format(new Date(report.date), "MMM dd, yyyy")}
+                              </p>
+                            </div>
+                          </div>
+                          <div className="flex items-center gap-3">
+                            <Badge className="bg-green-100 text-green-700">
+                              {report.status}
+                            </Badge>
+                            <Button size="sm" variant="outline">
+                              <Download className="h-4 w-4 mr-2" />
+                              Export
+                            </Button>
+                          </div>
                         </div>
-                        <div>
-                          <h4 className="font-medium">
-                            {activity.description}
-                          </h4>
-                          <p className="text-sm text-muted-foreground">
-                            {format(new Date(activity.date), "MMM dd, yyyy")}{" "}
-                            • {activity.status}
-                          </p>
-                        </div>
-                      </div>
-                      <div className="flex items-center gap-3">
-                        <div
-                          className={`font-semibold ${
-                            activity.type === "completion"
-                              ? "text-green-600"
-                              : "text-blue-600"
-                          }`}
-                        >
-                          {activity.points}
-                        </div>
-                        <Button size="sm" variant="outline">
-                          <Download className="h-4 w-4 mr-2" />
-                          Details
-                        </Button>
-                      </div>
+                      ))}
                     </div>
-                  ))}
-                </div>
-              </CardContent>
-            </Card>
+                  </CardContent>
+                </Card>
+
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-2">
+                      <History className="h-5 w-5 text-sheraton-gold" />
+                      Recent Activity Log
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="space-y-3">
+                      {recentActivities.map((activity) => (
+                        <div
+                          key={activity.id}
+                          className="flex items-center justify-between text-sm p-3 bg-muted rounded"
+                        >
+                          <div>
+                            <p className="font-medium">{activity.description}</p>
+                            <p className="text-xs text-muted-foreground">
+                              {format(new Date(activity.date), "MMM dd, yyyy")}
+                            </p>
+                          </div>
+                          <Badge variant="outline">{activity.status}</Badge>
+                        </div>
+                      ))}
+                    </div>
+                  </CardContent>
+                </Card>
+              </>
+            ) : (
+              // Service Provider Activities
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <Receipt className="h-5 w-5 text-sheraton-gold" />
+                    Activity History & Earnings
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-4">
+                    {recentActivities.map((activity) => (
+                      <div
+                        key={activity.id}
+                        className="flex items-center justify-between p-4 border rounded-lg"
+                      >
+                        <div className="flex items-center gap-4">
+                          <div
+                            className={`w-12 h-12 rounded-full flex items-center justify-center ${
+                              activity.type === "completion"
+                                ? "bg-green-100 text-green-600"
+                                : "bg-blue-100 text-blue-600"
+                            }`}
+                          >
+                            {activity.type === "completion" ? (
+                              <CheckCircle className="h-6 w-6" />
+                            ) : (
+                              <Gift className="h-6 w-6" />
+                            )}
+                          </div>
+                          <div>
+                            <h4 className="font-medium">
+                              {activity.description}
+                            </h4>
+                            <p className="text-sm text-muted-foreground">
+                              {format(new Date(activity.date), "MMM dd, yyyy")}{" "}
+                              • {activity.status}
+                            </p>
+                          </div>
+                        </div>
+                        <div className="flex items-center gap-3">
+                          <div
+                            className={`font-semibold ${
+                              activity.type === "completion"
+                                ? "text-green-600"
+                                : "text-blue-600"
+                            }`}
+                          >
+                            {activity.points}
+                          </div>
+                          <Button size="sm" variant="outline">
+                            <Download className="h-4 w-4 mr-2" />
+                            Details
+                          </Button>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </CardContent>
+              </Card>
+            )}
           </TabsContent>
 
           {/* Preferences Tab */}
@@ -920,160 +1358,472 @@ const ServicesProfilePage = () => {
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-6">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <div className="space-y-4">
-                    <h3 className="font-semibold">Service Preferences</h3>
-                    <div className="space-y-3">
-                      <div className="space-y-2">
-                        <Label>Preferred Role Type</Label>
-                        <Select value={userData.preferences.roleType}>
-                          <SelectTrigger>
-                            <SelectValue />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="manager">
-                              Property Manager
-                            </SelectItem>
-                            <SelectItem value="provider">
-                              Service Provider
-                            </SelectItem>
-                            <SelectItem value="coordinator">
-                              Coordinator
-                            </SelectItem>
-                          </SelectContent>
-                        </Select>
-                      </div>
-                      <div className="space-y-2">
-                        <Label>Task Category Focus</Label>
-                        <Select value={userData.preferences.taskCategory}>
-                          <SelectTrigger>
-                            <SelectValue />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="all">All Categories</SelectItem>
-                            <SelectItem value="maintenance">
-                              Maintenance
-                            </SelectItem>
-                            <SelectItem value="housekeeping">
-                              Housekeeping
-                            </SelectItem>
-                          </SelectContent>
-                        </Select>
-                      </div>
-                      <div className="space-y-2">
-                        <Label>Notification Type</Label>
-                        <Select value={userData.preferences.notificationType}>
-                          <SelectTrigger>
-                            <SelectValue />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="detailed">Detailed</SelectItem>
-                            <SelectItem value="summary">Summary</SelectItem>
-                            <SelectItem value="minimal">Minimal</SelectItem>
-                          </SelectContent>
-                        </Select>
+                {userRole === 'manager' ? (
+                  // Manager Preferences
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div className="space-y-4">
+                      <h3 className="font-semibold">Management Preferences</h3>
+                      <div className="space-y-3">
+                        <div className="space-y-2">
+                          <Label>Primary Property Type</Label>
+                          <Select defaultValue="residential">
+                            <SelectTrigger>
+                              <SelectValue />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="residential">
+                                Residential
+                              </SelectItem>
+                              <SelectItem value="commercial">
+                                Commercial
+                              </SelectItem>
+                              <SelectItem value="mixed">Mixed Use</SelectItem>
+                            </SelectContent>
+                          </Select>
+                        </div>
+                        <div className="space-y-2">
+                          <Label>Preferred Reporting Frequency</Label>
+                          <Select defaultValue="weekly">
+                            <SelectTrigger>
+                              <SelectValue />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="daily">Daily</SelectItem>
+                              <SelectItem value="weekly">Weekly</SelectItem>
+                              <SelectItem value="monthly">Monthly</SelectItem>
+                            </SelectContent>
+                          </Select>
+                        </div>
+                        <div className="space-y-2">
+                          <Label>Task Assignment Preference</Label>
+                          <Select defaultValue="auto">
+                            <SelectTrigger>
+                              <SelectValue />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="auto">
+                                Automatic Assignment
+                              </SelectItem>
+                              <SelectItem value="manual">
+                                Manual Assignment
+                              </SelectItem>
+                              <SelectItem value="approval">
+                                Requires Approval
+                              </SelectItem>
+                            </SelectContent>
+                          </Select>
+                        </div>
                       </div>
                     </div>
-                  </div>
 
-                  <div className="space-y-4">
-                    <h3 className="font-semibold">Notification Settings</h3>
-                    <div className="space-y-3">
-                      <div className="flex items-center justify-between">
-                        <Label htmlFor="tasks">Task Notifications</Label>
-                        <Switch
-                          id="tasks"
-                          checked={userData.preferences.notifications.tasks}
-                        />
-                      </div>
-                      <div className="flex items-center justify-between">
-                        <Label htmlFor="reports">Report Updates</Label>
-                        <Switch
-                          id="reports"
-                          checked={userData.preferences.notifications.reports}
-                        />
-                      </div>
-                      <div className="flex items-center justify-between">
-                        <Label htmlFor="alerts">System Alerts</Label>
-                        <Switch
-                          id="alerts"
-                          checked={userData.preferences.notifications.alerts}
-                        />
-                      </div>
-                      <div className="flex items-center justify-between">
-                        <Label htmlFor="newsletter">Newsletter</Label>
-                        <Switch
-                          id="newsletter"
-                          checked={
-                            userData.preferences.notifications.newsletter
-                          }
-                        />
+                    <div className="space-y-4">
+                      <h3 className="font-semibold">Notification Settings</h3>
+                      <div className="space-y-3">
+                        <div className="flex items-center justify-between">
+                          <Label htmlFor="tasks">Task Alerts</Label>
+                          <Switch
+                            id="tasks"
+                            checked={userData.preferences.notifications.tasks}
+                          />
+                        </div>
+                        <div className="flex items-center justify-between">
+                          <Label htmlFor="reports">Report Summaries</Label>
+                          <Switch
+                            id="reports"
+                            checked={userData.preferences.notifications.reports}
+                          />
+                        </div>
+                        <div className="flex items-center justify-between">
+                          <Label htmlFor="alerts">Budget Warnings</Label>
+                          <Switch
+                            id="alerts"
+                            checked={userData.preferences.notifications.alerts}
+                          />
+                        </div>
+                        <div className="flex items-center justify-between">
+                          <Label htmlFor="newsletter">Provider Updates</Label>
+                          <Switch
+                            id="newsletter"
+                            checked={
+                              userData.preferences.notifications.newsletter
+                            }
+                          />
+                        </div>
                       </div>
                     </div>
                   </div>
-                </div>
+                ) : (
+                  // Service Provider Preferences
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div className="space-y-4">
+                      <h3 className="font-semibold">Service Preferences</h3>
+                      <div className="space-y-3">
+                        <div className="space-y-2">
+                          <Label>Preferred Task Categories</Label>
+                          <Select value={userData.preferences.taskCategory}>
+                            <SelectTrigger>
+                              <SelectValue />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="all">All Categories</SelectItem>
+                              <SelectItem value="maintenance">
+                                Maintenance
+                              </SelectItem>
+                              <SelectItem value="housekeeping">
+                                Housekeeping
+                              </SelectItem>
+                            </SelectContent>
+                          </Select>
+                        </div>
+                        <div className="space-y-2">
+                          <Label>Notification Type</Label>
+                          <Select value={userData.preferences.notificationType}>
+                            <SelectTrigger>
+                              <SelectValue />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="detailed">Detailed</SelectItem>
+                              <SelectItem value="summary">Summary</SelectItem>
+                              <SelectItem value="minimal">Minimal</SelectItem>
+                            </SelectContent>
+                          </Select>
+                        </div>
+                        <div className="space-y-2">
+                          <Label>Theme</Label>
+                          <Select defaultValue="modern">
+                            <SelectTrigger>
+                              <SelectValue />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="modern">Modern</SelectItem>
+                              <SelectItem value="classic">Classic</SelectItem>
+                              <SelectItem value="dark">Dark Mode</SelectItem>
+                            </SelectContent>
+                          </Select>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="space-y-4">
+                      <h3 className="font-semibold">Notification Settings</h3>
+                      <div className="space-y-3">
+                        <div className="flex items-center justify-between">
+                          <Label htmlFor="tasks">Task Notifications</Label>
+                          <Switch
+                            id="tasks"
+                            checked={userData.preferences.notifications.tasks}
+                          />
+                        </div>
+                        <div className="flex items-center justify-between">
+                          <Label htmlFor="reports">Report Updates</Label>
+                          <Switch
+                            id="reports"
+                            checked={userData.preferences.notifications.reports}
+                          />
+                        </div>
+                        <div className="flex items-center justify-between">
+                          <Label htmlFor="alerts">System Alerts</Label>
+                          <Switch
+                            id="alerts"
+                            checked={userData.preferences.notifications.alerts}
+                          />
+                        </div>
+                        <div className="flex items-center justify-between">
+                          <Label htmlFor="newsletter">Newsletter</Label>
+                          <Switch
+                            id="newsletter"
+                            checked={
+                              userData.preferences.notifications.newsletter
+                            }
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                )}
               </CardContent>
             </Card>
           </TabsContent>
 
           {/* Referrals Tab */}
           <TabsContent value="referrals" className="space-y-6">
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Users className="h-5 w-5 text-sheraton-gold" />
-                  Refer Service Partners & Earn
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-6">
-                <div className="text-center p-6 bg-sheraton-gold/10 rounded-lg">
-                  <Gift className="h-12 w-12 mx-auto mb-4 text-sheraton-gold" />
-                  <h3 className="text-xl font-bold mb-2">Earn 500 Points</h3>
-                  <p className="text-muted-foreground mb-4">
-                    For each service provider you refer who completes their first task
-                  </p>
-                  <div className="flex items-center justify-center gap-2 p-3 bg-white rounded-lg border">
-                    <code className="font-mono text-lg">
-                      {generateServiceCode()}
-                    </code>
-                    <Button size="sm" onClick={copyServiceCode}>
-                      <Copy className="h-4 w-4" />
-                    </Button>
-                  </div>
-                  <Button className="mt-4 sheraton-gradient text-white">
-                    <Share2 className="h-4 w-4 mr-2" />
-                    Share Partner Invite
-                  </Button>
-                </div>
+            {userRole === 'manager' ? (
+              // Manager Referrals
+              <>
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-2">
+                      <Users className="h-5 w-5 text-sheraton-gold" />
+                      Refer Service Providers & Property Managers
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent className="space-y-6">
+                    <div className="text-center p-6 bg-sheraton-gold/10 rounded-lg">
+                      <Gift className="h-12 w-12 mx-auto mb-4 text-sheraton-gold" />
+                      <h3 className="text-xl font-bold mb-2">Grow Your Network</h3>
+                      <p className="text-muted-foreground mb-4">
+                        Refer qualified service providers or property managers to earn rewards and build your trusted network
+                      </p>
+                      <div className="flex items-center justify-center gap-2 p-3 bg-white rounded-lg border">
+                        <code className="font-mono text-lg">
+                          MGMT-2024-{userData.firstName?.toUpperCase()}
+                        </code>
+                        <Button size="sm" onClick={copyServiceCode}>
+                          <Copy className="h-4 w-4" />
+                        </Button>
+                      </div>
+                      <Button className="mt-4 sheraton-gradient text-white">
+                        <Share2 className="h-4 w-4 mr-2" />
+                        Share Referral Link
+                      </Button>
+                    </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                  <div className="text-center p-4 border rounded-lg">
-                    <div className="text-2xl font-bold text-sheraton-gold">
-                      8
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <Card className="border-2 border-sheraton-gold/30">
+                        <CardHeader className="pb-3">
+                          <CardTitle className="text-base flex items-center gap-2">
+                            <Users className="h-4 w-4 text-sheraton-gold" />
+                            Refer Service Providers
+                          </CardTitle>
+                        </CardHeader>
+                        <CardContent className="space-y-3">
+                          <div>
+                            <div className="text-2xl font-bold text-sheraton-gold">
+                              $250 / referral
+                            </div>
+                            <p className="text-xs text-muted-foreground mt-1">
+                              When they complete 5 tasks
+                            </p>
+                          </div>
+                          <ul className="space-y-2 text-sm">
+                            <li className="flex items-start gap-2">
+                              <CheckCircle className="h-4 w-4 text-green-500 flex-shrink-0 mt-0.5" />
+                              <span>Direct deposit bonus</span>
+                            </li>
+                            <li className="flex items-start gap-2">
+                              <CheckCircle className="h-4 w-4 text-green-500 flex-shrink-0 mt-0.5" />
+                              <span>Priority support for referred provider</span>
+                            </li>
+                          </ul>
+                        </CardContent>
+                      </Card>
+
+                      <Card className="border-2 border-sheraton-gold/30">
+                        <CardHeader className="pb-3">
+                          <CardTitle className="text-base flex items-center gap-2">
+                            <Briefcase className="h-4 w-4 text-sheraton-gold" />
+                            Refer Managers
+                          </CardTitle>
+                        </CardHeader>
+                        <CardContent className="space-y-3">
+                          <div>
+                            <div className="text-2xl font-bold text-sheraton-gold">
+                              $500 / referral
+                            </div>
+                            <p className="text-xs text-muted-foreground mt-1">
+                              When they manage their first property
+                            </p>
+                          </div>
+                          <ul className="space-y-2 text-sm">
+                            <li className="flex items-start gap-2">
+                              <CheckCircle className="h-4 w-4 text-green-500 flex-shrink-0 mt-0.5" />
+                              <span>Premium payment processing</span>
+                            </li>
+                            <li className="flex items-start gap-2">
+                              <CheckCircle className="h-4 w-4 text-green-500 flex-shrink-0 mt-0.5" />
+                              <span>Dedicated account support</span>
+                            </li>
+                          </ul>
+                        </CardContent>
+                      </Card>
                     </div>
-                    <div className="text-sm text-muted-foreground">
-                      Partners Referred
+                  </CardContent>
+                </Card>
+
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-2">
+                      <TrendingUp className="h-5 w-5 text-sheraton-gold" />
+                      Your Referral Performance
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                      <div className="text-center p-4 border rounded-lg">
+                        <div className="text-2xl font-bold text-sheraton-gold">
+                          12
+                        </div>
+                        <div className="text-sm text-muted-foreground">
+                          Total Referred
+                        </div>
+                      </div>
+                      <div className="text-center p-4 border rounded-lg">
+                        <div className="text-2xl font-bold text-sheraton-gold">
+                          10
+                        </div>
+                        <div className="text-sm text-muted-foreground">
+                          Active Users
+                        </div>
+                      </div>
+                      <div className="text-center p-4 border rounded-lg">
+                        <div className="text-2xl font-bold text-sheraton-gold">
+                          $3,500
+                        </div>
+                        <div className="text-sm text-muted-foreground">
+                          Earned
+                        </div>
+                      </div>
+                      <div className="text-center p-4 border rounded-lg">
+                        <div className="text-2xl font-bold text-sheraton-gold">
+                          87%
+                        </div>
+                        <div className="text-sm text-muted-foreground">
+                          Conversion Rate
+                        </div>
+                      </div>
                     </div>
-                  </div>
-                  <div className="text-center p-4 border rounded-lg">
-                    <div className="text-2xl font-bold text-sheraton-gold">
-                      6
+                  </CardContent>
+                </Card>
+              </>
+            ) : (
+              // Service Provider Referrals
+              <>
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-2">
+                      <Users className="h-5 w-5 text-sheraton-gold" />
+                      Refer Service Providers & Property Managers
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent className="space-y-6">
+                    <div className="text-center p-6 bg-sheraton-gold/10 rounded-lg">
+                      <Gift className="h-12 w-12 mx-auto mb-4 text-sheraton-gold" />
+                      <h3 className="text-xl font-bold mb-2">Grow Your Network & Earn</h3>
+                      <p className="text-muted-foreground mb-4">
+                        Refer qualified service providers or property managers and earn rewards
+                      </p>
+                      <div className="flex items-center justify-center gap-2 p-3 bg-white rounded-lg border">
+                        <code className="font-mono text-lg">
+                          {generateServiceCode()}
+                        </code>
+                        <Button size="sm" onClick={copyServiceCode}>
+                          <Copy className="h-4 w-4" />
+                        </Button>
+                      </div>
+                      <Button className="mt-4 sheraton-gradient text-white">
+                        <Share2 className="h-4 w-4 mr-2" />
+                        Share Referral Link
+                      </Button>
                     </div>
-                    <div className="text-sm text-muted-foreground">
-                      Active Partners
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <Card className="border-2 border-sheraton-gold/30">
+                        <CardHeader className="pb-3">
+                          <CardTitle className="text-base flex items-center gap-2">
+                            <Users className="h-4 w-4 text-sheraton-gold" />
+                            Refer Service Providers
+                          </CardTitle>
+                        </CardHeader>
+                        <CardContent className="space-y-3">
+                          <div>
+                            <div className="text-2xl font-bold text-sheraton-gold">
+                              500 Points
+                            </div>
+                            <p className="text-xs text-muted-foreground mt-1">
+                              When they complete their first task
+                            </p>
+                          </div>
+                          <ul className="space-y-2 text-sm">
+                            <li className="flex items-start gap-2">
+                              <CheckCircle className="h-4 w-4 text-green-500 flex-shrink-0 mt-0.5" />
+                              <span>Bonus points to your account</span>
+                            </li>
+                            <li className="flex items-start gap-2">
+                              <CheckCircle className="h-4 w-4 text-green-500 flex-shrink-0 mt-0.5" />
+                              <span>Instant credit on completion</span>
+                            </li>
+                          </ul>
+                        </CardContent>
+                      </Card>
+
+                      <Card className="border-2 border-sheraton-gold/30">
+                        <CardHeader className="pb-3">
+                          <CardTitle className="text-base flex items-center gap-2">
+                            <Briefcase className="h-4 w-4 text-sheraton-gold" />
+                            Refer Property Managers
+                          </CardTitle>
+                        </CardHeader>
+                        <CardContent className="space-y-3">
+                          <div>
+                            <div className="text-2xl font-bold text-sheraton-gold">
+                              1,000 Points
+                            </div>
+                            <p className="text-xs text-muted-foreground mt-1">
+                              When they manage their first property
+                            </p>
+                          </div>
+                          <ul className="space-y-2 text-sm">
+                            <li className="flex items-start gap-2">
+                              <CheckCircle className="h-4 w-4 text-green-500 flex-shrink-0 mt-0.5" />
+                              <span>Premium bonus points</span>
+                            </li>
+                            <li className="flex items-start gap-2">
+                              <CheckCircle className="h-4 w-4 text-green-500 flex-shrink-0 mt-0.5" />
+                              <span>Unlock special privileges</span>
+                            </li>
+                          </ul>
+                        </CardContent>
+                      </Card>
                     </div>
-                  </div>
-                  <div className="text-center p-4 border rounded-lg">
-                    <div className="text-2xl font-bold text-sheraton-gold">
-                      3,000
+                  </CardContent>
+                </Card>
+
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-2">
+                      <TrendingUp className="h-5 w-5 text-sheraton-gold" />
+                      Your Referral Performance
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                      <div className="text-center p-4 border rounded-lg">
+                        <div className="text-2xl font-bold text-sheraton-gold">
+                          8
+                        </div>
+                        <div className="text-sm text-muted-foreground">
+                          Total Referred
+                        </div>
+                      </div>
+                      <div className="text-center p-4 border rounded-lg">
+                        <div className="text-2xl font-bold text-sheraton-gold">
+                          6
+                        </div>
+                        <div className="text-sm text-muted-foreground">
+                          Active Users
+                        </div>
+                      </div>
+                      <div className="text-center p-4 border rounded-lg">
+                        <div className="text-2xl font-bold text-sheraton-gold">
+                          3,000
+                        </div>
+                        <div className="text-sm text-muted-foreground">
+                          Points Earned
+                        </div>
+                      </div>
+                      <div className="text-center p-4 border rounded-lg">
+                        <div className="text-2xl font-bold text-sheraton-gold">
+                          75%
+                        </div>
+                        <div className="text-sm text-muted-foreground">
+                          Conversion Rate
+                        </div>
+                      </div>
                     </div>
-                    <div className="text-sm text-muted-foreground">
-                      Points Earned
-                    </div>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
+                  </CardContent>
+                </Card>
+              </>
+            )}
           </TabsContent>
         </Tabs>
       </div>
