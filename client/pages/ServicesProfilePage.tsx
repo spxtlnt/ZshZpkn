@@ -350,7 +350,7 @@ const ServicesProfilePage = () => {
           onValueChange={setActiveTab}
           className="space-y-8"
         >
-          <TabsList className={`grid w-full ${userRole === 'manager' ? 'grid-cols-2 lg:grid-cols-5' : 'grid-cols-2 lg:grid-cols-6'} h-auto p-1`}>
+          <TabsList className="grid w-full grid-cols-2 lg:grid-cols-6 h-auto p-1">
             <TabsTrigger
               value="dashboard"
               className="flex items-center gap-2 py-3"
@@ -386,15 +386,13 @@ const ServicesProfilePage = () => {
               <Settings className="h-4 w-4" />
               <span className="hidden sm:inline">Preferences</span>
             </TabsTrigger>
-            {userRole === 'service_provider' && (
-              <TabsTrigger
-                value="referrals"
-                className="flex items-center gap-2 py-3"
-              >
-                <Share2 className="h-4 w-4" />
-                <span className="hidden sm:inline">Refer</span>
-              </TabsTrigger>
-            )}
+            <TabsTrigger
+              value="referrals"
+              className="flex items-center gap-2 py-3"
+            >
+              <Share2 className="h-4 w-4" />
+              <span className="hidden sm:inline">Refer</span>
+            </TabsTrigger>
           </TabsList>
 
           {/* Dashboard Tab */}
@@ -1549,62 +1547,203 @@ const ServicesProfilePage = () => {
 
           {/* Referrals Tab */}
           <TabsContent value="referrals" className="space-y-6">
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Users className="h-5 w-5 text-sheraton-gold" />
-                  Refer Service Partners & Earn
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-6">
-                <div className="text-center p-6 bg-sheraton-gold/10 rounded-lg">
-                  <Gift className="h-12 w-12 mx-auto mb-4 text-sheraton-gold" />
-                  <h3 className="text-xl font-bold mb-2">Earn 500 Points</h3>
-                  <p className="text-muted-foreground mb-4">
-                    For each service provider you refer who completes their first task
-                  </p>
-                  <div className="flex items-center justify-center gap-2 p-3 bg-white rounded-lg border">
-                    <code className="font-mono text-lg">
-                      {generateServiceCode()}
-                    </code>
-                    <Button size="sm" onClick={copyServiceCode}>
-                      <Copy className="h-4 w-4" />
+            {userRole === 'manager' ? (
+              // Manager Referrals
+              <>
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-2">
+                      <Users className="h-5 w-5 text-sheraton-gold" />
+                      Refer Service Providers & Property Managers
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent className="space-y-6">
+                    <div className="text-center p-6 bg-sheraton-gold/10 rounded-lg">
+                      <Gift className="h-12 w-12 mx-auto mb-4 text-sheraton-gold" />
+                      <h3 className="text-xl font-bold mb-2">Grow Your Network</h3>
+                      <p className="text-muted-foreground mb-4">
+                        Refer qualified service providers or property managers to earn rewards and build your trusted network
+                      </p>
+                      <div className="flex items-center justify-center gap-2 p-3 bg-white rounded-lg border">
+                        <code className="font-mono text-lg">
+                          MGMT-2024-{userData.firstName?.toUpperCase()}
+                        </code>
+                        <Button size="sm" onClick={copyServiceCode}>
+                          <Copy className="h-4 w-4" />
+                        </Button>
+                      </div>
+                      <Button className="mt-4 sheraton-gradient text-white">
+                        <Share2 className="h-4 w-4 mr-2" />
+                        Share Referral Link
+                      </Button>
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <Card className="border-2 border-sheraton-gold/30">
+                        <CardHeader className="pb-3">
+                          <CardTitle className="text-base flex items-center gap-2">
+                            <Users className="h-4 w-4 text-sheraton-gold" />
+                            Refer Service Providers
+                          </CardTitle>
+                        </CardHeader>
+                        <CardContent className="space-y-3">
+                          <div>
+                            <div className="text-2xl font-bold text-sheraton-gold">
+                              $250 / referral
+                            </div>
+                            <p className="text-xs text-muted-foreground mt-1">
+                              When they complete 5 tasks
+                            </p>
+                          </div>
+                          <ul className="space-y-2 text-sm">
+                            <li className="flex items-start gap-2">
+                              <CheckCircle className="h-4 w-4 text-green-500 flex-shrink-0 mt-0.5" />
+                              <span>Direct deposit bonus</span>
+                            </li>
+                            <li className="flex items-start gap-2">
+                              <CheckCircle className="h-4 w-4 text-green-500 flex-shrink-0 mt-0.5" />
+                              <span>Priority support for referred provider</span>
+                            </li>
+                          </ul>
+                        </CardContent>
+                      </Card>
+
+                      <Card className="border-2 border-sheraton-gold/30">
+                        <CardHeader className="pb-3">
+                          <CardTitle className="text-base flex items-center gap-2">
+                            <Briefcase className="h-4 w-4 text-sheraton-gold" />
+                            Refer Managers
+                          </CardTitle>
+                        </CardHeader>
+                        <CardContent className="space-y-3">
+                          <div>
+                            <div className="text-2xl font-bold text-sheraton-gold">
+                              $500 / referral
+                            </div>
+                            <p className="text-xs text-muted-foreground mt-1">
+                              When they manage their first property
+                            </p>
+                          </div>
+                          <ul className="space-y-2 text-sm">
+                            <li className="flex items-start gap-2">
+                              <CheckCircle className="h-4 w-4 text-green-500 flex-shrink-0 mt-0.5" />
+                              <span>Premium payment processing</span>
+                            </li>
+                            <li className="flex items-start gap-2">
+                              <CheckCircle className="h-4 w-4 text-green-500 flex-shrink-0 mt-0.5" />
+                              <span>Dedicated account support</span>
+                            </li>
+                          </ul>
+                        </CardContent>
+                      </Card>
+                    </div>
+                  </CardContent>
+                </Card>
+
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-2">
+                      <TrendingUp className="h-5 w-5 text-sheraton-gold" />
+                      Your Referral Performance
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                      <div className="text-center p-4 border rounded-lg">
+                        <div className="text-2xl font-bold text-sheraton-gold">
+                          12
+                        </div>
+                        <div className="text-sm text-muted-foreground">
+                          Total Referred
+                        </div>
+                      </div>
+                      <div className="text-center p-4 border rounded-lg">
+                        <div className="text-2xl font-bold text-sheraton-gold">
+                          10
+                        </div>
+                        <div className="text-sm text-muted-foreground">
+                          Active Users
+                        </div>
+                      </div>
+                      <div className="text-center p-4 border rounded-lg">
+                        <div className="text-2xl font-bold text-sheraton-gold">
+                          $3,500
+                        </div>
+                        <div className="text-sm text-muted-foreground">
+                          Earned
+                        </div>
+                      </div>
+                      <div className="text-center p-4 border rounded-lg">
+                        <div className="text-2xl font-bold text-sheraton-gold">
+                          87%
+                        </div>
+                        <div className="text-sm text-muted-foreground">
+                          Conversion Rate
+                        </div>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              </>
+            ) : (
+              // Service Provider Referrals
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <Users className="h-5 w-5 text-sheraton-gold" />
+                    Refer Service Partners & Earn
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-6">
+                  <div className="text-center p-6 bg-sheraton-gold/10 rounded-lg">
+                    <Gift className="h-12 w-12 mx-auto mb-4 text-sheraton-gold" />
+                    <h3 className="text-xl font-bold mb-2">Earn 500 Points</h3>
+                    <p className="text-muted-foreground mb-4">
+                      For each service provider you refer who completes their first task
+                    </p>
+                    <div className="flex items-center justify-center gap-2 p-3 bg-white rounded-lg border">
+                      <code className="font-mono text-lg">
+                        {generateServiceCode()}
+                      </code>
+                      <Button size="sm" onClick={copyServiceCode}>
+                        <Copy className="h-4 w-4" />
+                      </Button>
+                    </div>
+                    <Button className="mt-4 sheraton-gradient text-white">
+                      <Share2 className="h-4 w-4 mr-2" />
+                      Share Partner Invite
                     </Button>
                   </div>
-                  <Button className="mt-4 sheraton-gradient text-white">
-                    <Share2 className="h-4 w-4 mr-2" />
-                    Share Partner Invite
-                  </Button>
-                </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                  <div className="text-center p-4 border rounded-lg">
-                    <div className="text-2xl font-bold text-sheraton-gold">
-                      8
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div className="text-center p-4 border rounded-lg">
+                      <div className="text-2xl font-bold text-sheraton-gold">
+                        8
+                      </div>
+                      <div className="text-sm text-muted-foreground">
+                        Partners Referred
+                      </div>
                     </div>
-                    <div className="text-sm text-muted-foreground">
-                      Partners Referred
+                    <div className="text-center p-4 border rounded-lg">
+                      <div className="text-2xl font-bold text-sheraton-gold">
+                        6
+                      </div>
+                      <div className="text-sm text-muted-foreground">
+                        Active Partners
+                      </div>
+                    </div>
+                    <div className="text-center p-4 border rounded-lg">
+                      <div className="text-2xl font-bold text-sheraton-gold">
+                        3,000
+                      </div>
+                      <div className="text-sm text-muted-foreground">
+                        Points Earned
+                      </div>
                     </div>
                   </div>
-                  <div className="text-center p-4 border rounded-lg">
-                    <div className="text-2xl font-bold text-sheraton-gold">
-                      6
-                    </div>
-                    <div className="text-sm text-muted-foreground">
-                      Active Partners
-                    </div>
-                  </div>
-                  <div className="text-center p-4 border rounded-lg">
-                    <div className="text-2xl font-bold text-sheraton-gold">
-                      3,000
-                    </div>
-                    <div className="text-sm text-muted-foreground">
-                      Points Earned
-                    </div>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
+                </CardContent>
+              </Card>
+            )}
           </TabsContent>
         </Tabs>
       </div>
